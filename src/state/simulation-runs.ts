@@ -24,7 +24,6 @@ type EndStat = {
 
 export type SimulationRun = {
   formValues: FormValues;
-  status: MultiRunStatus;
   charts: Chart[];
   endStats: EndStat;
 };
@@ -59,7 +58,6 @@ export const simulationRuns = signal<MultiSimulationRun>({
     formValues: {
       ...currentForm.value,
     },
-    status: MultiRunStatuses.LOADING_R,
     charts: [],
     endStats: { totalRecovered: 0 },
   },
@@ -74,8 +72,24 @@ export const createNewRun = () => {
       formValues: {
         ...currentForm.value,
       },
-      status: MultiRunStatuses.IN_PROGRESS,
       charts: [],
+      endStats: { totalRecovered: 0 },
+    },
+  };
+};
+
+export const markRunAsCompleted = () => {
+  simulationRuns.value = {
+    ...simulationRuns.value,
+    [maxRunId.value]: {
+      ...simulationRuns.value[maxRunId.value],
+      charts: simulationRuns.value[maxRunId.value].charts.map((chart) => ({
+        ...chart,
+        status: SimulationRunStatuses.COMPLETED,
+      })),
+      formValues: {
+        ...currentForm.value,
+      },
       endStats: { totalRecovered: 0 },
     },
   };

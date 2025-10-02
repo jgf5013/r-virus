@@ -88,7 +88,11 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
       }
 
       const isChartInError = (parsedResult as ParsedErrorMessage).isError;
-      const chartStatus = isChartInError ? SimulationRunStatuses.IN_PROGRESS : (dataElement.status || SimulationRunStatuses.IN_PROGRESS);
+      const chartStatus = updatingChart?.status === SimulationRunStatuses.COMPLETED
+        ? SimulationRunStatuses.COMPLETED
+        : isChartInError
+          ? SimulationRunStatuses.ERROR
+          : (dataElement.status || SimulationRunStatuses.IN_PROGRESS);
       
       // The chart already exists, so we update it
       simulationRuns.value = {
@@ -99,7 +103,7 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
           (chart.modelType === dataElement.model_type || chart.modelType === 'all')
               ? {
                   ...chart,
-                  data: [...(chart.data ?? []), dataElement],
+                  data: chartStatus === SimulationRunStatuses.IN_PROGRESS ? [...(chart.data ?? []), dataElement] : chart.data,
                   status: chartStatus,
                 }
               : chart

@@ -93,7 +93,7 @@ type ArchetypeOptionKeys = keyof typeof archetypes;
 
 const DEFAULT_ARCHETYPE: ArchetypeOptionKeys = '2';
 
-export const archetypeOptions = Object.values(archetypes).map(model => model.label);
+export const archetypeOptions = Object.values(archetypes).sort().map((archetype) => archetype.label);
 
 export type ArchetypeOption = typeof archetypeOptions[number];
 
