@@ -17,7 +17,8 @@ const Refresh = (props: RefreshProps) => {
     markRunAsCompleted();
   };
 
-  const isCurrentlyRunning = currentSimulationRunStatus.value !== MultiRunStatuses.COMPLETED;
+  const isLoadingR = currentSimulationRunStatus.value === MultiRunStatuses.LOADING_R;
+  const isCurrentlyRunning = !isLoadingR && (currentSimulationRunStatus.value !== MultiRunStatuses.COMPLETED);
 
   if(isCurrentlyRunning) {
     return (
@@ -42,8 +43,9 @@ const Refresh = (props: RefreshProps) => {
       variant="filled"
       size="xl"
       radius="xl"
-      aria-label="Settings"
+      aria-label={isLoadingR ? "Simulation loading" : "Run simulation"}
       onClick={handleOnPlayClick}
+      disabled={isLoadingR}
       {...props}
     >
       <IconPlayerPlay />

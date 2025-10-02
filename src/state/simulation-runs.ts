@@ -108,5 +108,11 @@ export const currentSimulationRunStatus = computed(() => {
   if (hasSimulationStillRunning) {
     return MultiRunStatuses.IN_PROGRESS;
   }
+  const isLoadingR = Object.entries(simulationRuns.value[maxRunId.value].charts).some(([_, result]) => {
+    return result.status === SimulationRunStatuses.LOADING_R;
+  });
+  if (isLoadingR) { 
+    return MultiRunStatuses.LOADING_R;
+  }
   return MultiRunStatuses.COMPLETED;
 });
