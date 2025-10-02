@@ -1,6 +1,6 @@
 import { computed, signal } from "@preact/signals-react";
 import { currentForm, DataElement, FormValues } from "@state/form-controls";
-import { ModelType } from "./chart";
+import { ModelReferences, ModelType } from "./chart";
 
 const INITIAL_RUN_ID = 1;
 
@@ -116,3 +116,25 @@ export const currentSimulationRunStatus = computed(() => {
   }
   return MultiRunStatuses.COMPLETED;
 });
+
+type RecoveredStats = {
+  [modelReference: string]: {
+    recovered: number;
+    time: number;
+  } | undefined;
+}
+
+export const recoveredStats = computed(() => {
+  const d: RecoveredStats = {};
+  Object.entries(ModelReferences).forEach(([modelType, modelRef]) => {
+    const chart = displayedSimulationRun.value.charts.find(
+      (c) => c.modelType === modelType && (c as LoadedChart).data
+    ) as LoadedChart | undefined;
+    const data = chart?.data ?? [];
+    d[modelType] = {
+      recovered: data[data.length - 1]?.state?.R ?? 0,
+      time: data.find((d) => data[data.length - 1]?.state?.R === d.state?.R)?.time ?? 0,
+    };
+  });
+  return d;
+})

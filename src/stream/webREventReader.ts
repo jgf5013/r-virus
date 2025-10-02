@@ -60,14 +60,6 @@ export const readWebRDataElementsEvents = async ({webR}: EventReaderProps) => {
   webR.flush();
 
   for await (const item of webR.stream()) {
-    console.log('webREventReader - item=', item);
-    if (item.type === 'stderr') {
-      const parsedResult = extractJsonObject(item.data);
-      // const { dataElement } = parsedResult ?? {};
-      if ((parsedResult as ParsedErrorMessage)?.isError) {
-        console.log(`stopping ${parsedResult?.dataElement.model_type}!!!`);
-      }
-    }
     try {
       webR.flush();
       const parsedResult = extractJsonObject(item.data);

@@ -158,7 +158,7 @@ const VirusPlotSvg = ({ chart }: { chart: LoadedChart}) => {
       } else if (left) {
         interpY = left.state?.[currentMetric];
       }
-      if (!isNaN(interpY)) {
+      if (!isNaN(interpY) && interpY >= 0) {
         mouseMetrics.value[modelType as MouseMetricKeys] = interpY;
       }
     });
