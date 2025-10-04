@@ -1,6 +1,6 @@
 import { computed, signal } from "@preact/signals-react";
 import { currentForm, DataElement, FormValues } from "@state/form-controls";
-import { ModelType } from "./chart";
+import { ModelReferences, ModelType } from "./chart";
 
 const INITIAL_RUN_ID = 1;
 
@@ -24,7 +24,6 @@ type EndStat = {
 
 export type SimulationRun = {
   formValues: FormValues;
-  status: MultiRunStatus;
   charts: Chart[];
   endStats: EndStat;
 };
@@ -59,7 +58,6 @@ export const simulationRuns = signal<MultiSimulationRun>({
     formValues: {
       ...currentForm.value,
     },
-    status: MultiRunStatuses.LOADING_R,
     charts: [],
     endStats: { totalRecovered: 0 },
   },
@@ -74,8 +72,24 @@ export const createNewRun = () => {
       formValues: {
         ...currentForm.value,
       },
-      status: MultiRunStatuses.IN_PROGRESS,
       charts: [],
+      endStats: { totalRecovered: 0 },
+    },
+  };
+};
+
+export const markRunAsCompleted = () => {
+  simulationRuns.value = {
+    ...simulationRuns.value,
+    [maxRunId.value]: {
+      ...simulationRuns.value[maxRunId.value],
+      charts: simulationRuns.value[maxRunId.value].charts.map((chart) => ({
+        ...chart,
+        status: SimulationRunStatuses.COMPLETED,
+      })),
+      formValues: {
+        ...currentForm.value,
+      },
       endStats: { totalRecovered: 0 },
     },
   };
@@ -94,5 +108,33 @@ export const currentSimulationRunStatus = computed(() => {
   if (hasSimulationStillRunning) {
     return MultiRunStatuses.IN_PROGRESS;
   }
+  const isLoadingR = Object.entries(simulationRuns.value[maxRunId.value].charts).some(([_, result]) => {
+    return result.status === SimulationRunStatuses.LOADING_R;
+  });
+  if (isLoadingR) { 
+    return MultiRunStatuses.LOADING_R;
+  }
   return MultiRunStatuses.COMPLETED;
 });
+
+type RecoveredStats = {
+  [modelReference: string]: {
+    recovered: number;
+    time: number;
+  } | undefined;
+}
+
+export const recoveredStats = computed(() => {
+  const d: RecoveredStats = {};
+  Object.entries(ModelReferences).forEach(([modelType, modelRef]) => {
+    const chart = displayedSimulationRun.value.charts.find(
+      (c) => c.modelType === modelType && (c as LoadedChart).data
+    ) as LoadedChart | undefined;
+    const data = chart?.data ?? [];
+    d[modelType] = {
+      recovered: data[data.length - 1]?.state?.R ?? 0,
+      time: data.find((d) => data[data.length - 1]?.state?.R === d.state?.R)?.time ?? 0,
+    };
+  });
+  return d;
+})

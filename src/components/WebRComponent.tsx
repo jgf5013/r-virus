@@ -78,7 +78,6 @@ export const WebRComponent = () => {
             status: MultiRunStatuses.IN_PROGRESS,
           }],
           formValues: currentForm.value,
-          status: MultiRunStatuses.IN_PROGRESS,
           endStats: {
             totalRecovered:0 // TODO: JFisher - fixme later
           }

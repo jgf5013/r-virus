@@ -3,6 +3,7 @@ import styles from './Legend.module.css';
 import { Paper, Title, Text } from '@mantine/core';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useMediaQuery } from '@mantine/hooks';
+import { recoveredStats } from '@state/simulation-runs';
 
 const Legend = () => {
   useSignals();
@@ -31,23 +32,18 @@ const Legend = () => {
         })}
       </Paper>
       <Paper shadow="xs" p="sm" className={styles.legendRoot}>
-      <Title order={3}>{StateKeys.R.label}{mouseX.value && `: t = 100`}</Title>
-        {/* TODO: JFisher - get the end chart value and show it in legend */}
-        {/* {displayedSimulationRun.value.charts.filter((c) => c.modelType === ModelReferences.all.value)} */}
-        {(mouseMetrics.value && mouseX.value) && Object.entries(mouseMetrics.value)
-        .filter((k) => k[0] !== 't')
-        .sort(([a], [b]) => {
-          return ModelReferences[a as keyof typeof ModelReferences].order - ModelReferences[b as keyof typeof ModelReferences].order;
-        })
-        .map(([k, value]) => {
+      <Title order={3}>{StateKeys.R.label}</Title>
+
+        {Object.entries(recoveredStats.value).map(([k, value]) => {
+          if(k === 'all') return null; // skip "all" metric
           const metricLabel = ModelReferences[k as keyof typeof ModelReferences].label;
           if (!metricLabel) return null; // Skip if no label found
 
           return (
             <>
-              <div key={`legend-time-end-${k}`} className={styles.legendItem}>
+              <div key={`legend-time-recovery-end-${k}`} className={styles.legendItem}>
                 <span className={styles.legendColor} style={{ backgroundColor: lineStyles[k as keyof typeof lineStyles].color }} />
-                <span>{metricLabel}</span>: {value && <strong>{Math.floor(value)}</strong>}
+                <span>{metricLabel}</span>: <span>{value?.recovered && Math.floor(value.recovered)} (t={Math.floor(value?.time ?? 0)})</span>
               </div>
             </>
           );

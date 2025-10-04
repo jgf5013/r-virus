@@ -93,7 +93,7 @@ type ArchetypeOptionKeys = keyof typeof archetypes;
 
 const DEFAULT_ARCHETYPE: ArchetypeOptionKeys = '2';
 
-export const archetypeOptions = Object.values(archetypes).map(model => model.label);
+export const archetypeOptions = Object.values(archetypes).sort().map((archetype) => archetype.label);
 
 export type ArchetypeOption = typeof archetypeOptions[number];
 
@@ -156,9 +156,7 @@ const findArchetypeByLabel = (label: ArchetypeOption): Archetype | undefined => 
 
 // Create a wrapper around currentForm to handle archetype changes
 export const updateArchetypeCorollaries = (archetypeLabel: ArchetypeOption) => {
-  console.log('form-controls - archetypeLabel=', archetypeLabel);
   const archetype = findArchetypeByLabel(archetypeLabel);
-  console.log('form-controls - archetype=', archetype);
   if (!archetype) return;
   
   // Update all relevant values based on the selected archetype
@@ -166,7 +164,6 @@ export const updateArchetypeCorollaries = (archetypeLabel: ArchetypeOption) => {
     ...currentForm.value,
     archetype: archetypeLabel,
   };
-  console.log('form-controls - archetype.corollaries=', archetype.corollaries);
   if(archetype.corollaries?.reproductionNumber !== undefined) {
     currentForm.value = {
       ...currentForm.value,
@@ -179,7 +176,6 @@ export const updateArchetypeCorollaries = (archetypeLabel: ArchetypeOption) => {
       serialInterval: archetype.corollaries?.serialInterval?.default,
     }
   }
-  console.log('form-controls - currentForm.value=', currentForm.value);
 };
 
 export const archetypeCorollaries = computed(() => {
