@@ -126,7 +126,7 @@ type RecoveredStats = {
 
 export const recoveredStats = computed(() => {
   const d: RecoveredStats = {};
-  Object.entries(ModelReferences).forEach(([modelType, modelRef]) => {
+  Object.entries(ModelReferences).forEach(([modelType, _]) => {
     const chart = displayedSimulationRun.value.charts.find(
       (c) => c.modelType === modelType && (c as LoadedChart).data
     ) as LoadedChart | undefined;
