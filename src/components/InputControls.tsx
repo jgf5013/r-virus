@@ -7,6 +7,7 @@ import { NumberInput, Paper, Select } from '@mantine/core';
 import styles from './InputControls.module.css';
 import { Refresh } from "./Refresh";
 import { useEffect } from "preact/hooks";
+import { InputControlPopover } from "./InputControlPopover";
 
 const InputControls = () => {
 
@@ -75,35 +76,35 @@ const InputControls = () => {
       <Refresh className={styles.refresh} />
       <form className={styles.inputControlOptions}>
         <Select
-          label="Archetype"
+          label={<span className={styles.label}>Archetype<InputControlPopover info="Some info about archetype" /></span>}
           value={currentForm.value.archetype}
           onChange={handleArchetypeChange}
           data={archetypeOptions}
         />
         <NumberInput
+          label={<span className={styles.label}>Reproduction Number<InputControlPopover info="Some info about reproduction number" /></span>}
           {...form.getInputProps('reproductionNumber')}
-          label="Reproduction Number"
           value={currentForm.value.reproductionNumber}
         />
         <NumberInput
+          label={<span className={styles.label}>Serial Interval<InputControlPopover info="Some info about serial interval" /></span>}
           {...form.getInputProps('serialInterval')}
-          label="Serial Interval"
           value={currentForm.value.serialInterval}
         />
         <NumberInput
           {...form.getInputProps('mu')}
-          label="Mean Degree"
+          label={<span className={styles.label}>Mean Degree<InputControlPopover info="Some info about mean degree" /></span>}
           value={currentForm.value.mu}
         />
         <NumberInput
           {...form.getInputProps('dispersion')}
-          label="Dispersion"
+          label={<span className={styles.label}>Dispersion<InputControlPopover info="Some info about dispersion" /></span>}
           value={currentForm.value.dispersion}
         />
         <NumberInput
           {...form.getInputProps('populationSize')}
           clampBehavior="none"
-          label="Population"
+          label={<span className={styles.label}>Population<InputControlPopover info="Some info about population" /></span>}
           value={currentForm.value.populationSize}
         />
       </form>

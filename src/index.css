@@ -57,3 +57,7 @@ body {
     background-color: var(--background-color-dark);
   }
 }
+
+label {
+  width: 100%;
+}
