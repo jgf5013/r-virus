@@ -1,4 +1,5 @@
-import { computed, signal } from "@preact/signals-react";
+import { signal } from "@preact/signals-react";
+import { findArchetypeByLabel } from "@utils/state";
 import type { ModelType } from "./chart";
 import { SimulationRunStatus } from "./simulation-runs";
 
@@ -6,7 +7,7 @@ export const MIN_INDEX = 0;
 export const MAX_INDEX = 1;
 
 
-type Archetype = {
+export type Archetype = {
   value: number;
   label: string;
   corollaries?: {
@@ -15,7 +16,7 @@ type Archetype = {
   };
 };
 
-const archetypes: Record<string, Archetype> = {
+export const archetypes: Record<string, Archetype> = {
   '1': { value: 1, label: 'CCHFV, ZIKV', corollaries: {
     reproductionNumber: {
       default: 0.37,
@@ -91,7 +92,7 @@ const archetypes: Record<string, Archetype> = {
 
 type ArchetypeOptionKeys = keyof typeof archetypes;
 
-const DEFAULT_ARCHETYPE: ArchetypeOptionKeys = '2';
+export const DEFAULT_ARCHETYPE: ArchetypeOptionKeys = '2';
 
 export const archetypeOptions = Object.values(archetypes).sort().map((archetype) => archetype.label);
 
@@ -149,39 +150,18 @@ export const currentForm = signal<FormValues>({
   reproductionNumber: archetypes[DEFAULT_ARCHETYPE].corollaries!.reproductionNumber.default,
 });
 
-// Helper function to find an archetype by its label
-const findArchetypeByLabel = (label: ArchetypeOption): Archetype | undefined => {
-  return Object.values(archetypes).find(archetype => archetype.label === label);
-};
-
 // Create a wrapper around currentForm to handle archetype changes
 export const updateArchetypeCorollaries = (archetypeLabel: ArchetypeOption) => {
-  const archetype = findArchetypeByLabel(archetypeLabel);
+  const archetype = findArchetypeByLabel(archetypes, archetypeLabel);
   if (!archetype) return;
-  
-  // Update all relevant values based on the selected archetype
+
   currentForm.value = {
     ...currentForm.value,
     archetype: archetypeLabel,
+    reproductionNumber: archetype.corollaries?.reproductionNumber !== undefined ?
+      archetype.corollaries?.reproductionNumber?.default : currentForm.value.reproductionNumber,
+    serialInterval: archetype.corollaries?.serialInterval !== undefined ?
+      archetype.corollaries?.serialInterval?.default : currentForm.value.serialInterval,
   };
-  if(archetype.corollaries?.reproductionNumber !== undefined) {
-    currentForm.value = {
-      ...currentForm.value,
-      reproductionNumber: archetype.corollaries?.reproductionNumber?.default,
-    }
-  }
-  if(archetype.corollaries?.serialInterval !== undefined) {
-    currentForm.value = {
-      ...currentForm.value,
-      serialInterval: archetype.corollaries?.serialInterval?.default,
-    }
-  }
-};
 
-export const archetypeCorollaries = computed(() => {
-  const archetype = findArchetypeByLabel(currentForm.value.archetype);
-  if (!archetype) {
-    return archetypes[DEFAULT_ARCHETYPE].corollaries;
-  }
-  return archetype?.corollaries;
-});
+};
